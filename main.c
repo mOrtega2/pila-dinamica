@@ -33,6 +33,10 @@ int desapilar(t_pila* , t_dato* );
 void vaciarPila(t_pila* );
 int elegirMenu();
 void ingresarDatos(t_dato*);
+void guardarEnArchivo(t_pila *, t_dato *);
+void sacarDeArchivo(t_pila *, t_dato *);
+int abrirArchivo(FILE **, const char *, const char *, int);
+void mostrarArchivo(t_dato *);
 
 int main()
 {
@@ -106,6 +110,18 @@ while(opcion!=0)
 
                 break;
 
+            case 8:
+
+                guardarEnArchivo(&pila, &dato);
+
+                break;
+
+            case 9:
+
+                mostrarArchivo(&dato);
+
+                break;
+
             case 0:
                 printf("Ha decidido salir");
 
@@ -126,16 +142,17 @@ return 0;
 int elegirMenu()
 {
      int opcion;
-     printf("**********MENU DE OPCIONES**********\n   \
-                1- Crear Pila\n                       \
-                2- Pila Vacia\n                       \
-                3- Pila LLena\n                       \
-                4- Ver tope de pila\n                 \
-                5- Apilar\n                           \
-                6- Desapilar\n                        \
-                7- Vaciar pila\n                      \
-                0- Salir\n                            \
-                INGRESE EL NUMERO DE OPCION: ");
+     printf("**********MENU DE OPCIONES**********\n \
+1- Crear Pila\n \
+2- Pila Vacia\n \
+3- Pila LLena\n \
+4- Ver tope de pila\n \
+5- Apilar\n \
+6- Desapilar\n \
+7- Vaciar pila\n \
+8- Guardar en Archivo\n \
+0- Salir\n \
+INGRESE EL NUMERO DE OPCION: ");
 
       scanf("%d",&opcion);
       return opcion;
@@ -208,8 +225,8 @@ int desapilar(t_pila* pp, t_dato* pd)
 
     t_nodo* aux = *pp ;
 
-    *pp = (*pp)->sig;
-    *pd = (*pp)->dato;
+    *pp = aux->sig;
+    *pd = aux->dato;
 
     free(aux);
 
@@ -229,11 +246,44 @@ void vaciarPila(t_pila* pp)
 
 void ingresarDatos(t_dato* pd)
 {
+    printf("Edad: \n");
     scanf("%d", &pd->edad);
+    fflush(stdin);
+    printf("Nombre: \n");
     gets(pd->nom);
+    fflush(stdin);
+    printf("Apellido: \n");
     gets(pd->ape);
-   scanf("%f", &pd->prom);
+    fflush(stdin);
+    printf("Promedio: \n");
+    scanf("%f", &pd->prom);
+    fflush(stdin);
 
+}
+
+void guardarEnArchivo(t_pila *pp, t_dato *pd)
+{
+    FILE *pf;
+    abrirArchivo(&pf, "ArchivoBin", "w+ b", CON_MSJ);
+    while(!(pilaVacia(pp)))
+    {
+        desapilar(pp, pd);
+        fwrite(pd, sizeof(t_dato), 1, pf);
+    }
+}
+
+void mostrarArchivo(t_dato *pd)
+{
+    FILE *pf;
+    abrirArchivo(&pf, "ArchivoBin", "w+ b", CON_MSJ);
+    while(!feof(pf))
+    {
+        fread(pd, sizeof(t_dato), 1, pf);
+        printf("%d \n", pd -> edad);
+        puts(pd -> nom);
+        puts(pd -> ape);
+        printf("%f \n", pd ->prom);
+    }
 }
 
 
